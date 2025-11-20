@@ -1,0 +1,17 @@
+package dev.sirpaws.searchjei;
+
+import dev.sirpaws.searchjei.api.IViewSlot;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.phys.Vec2;
+
+public record DefaultSlotView(Slot slot) implements IViewSlot {
+    @Override
+    public Vec2 getRenderPos(int guiLeft, int guiTop) {
+        return new Vec2(slot.x, slot.y);
+    }
+
+    @Override
+    public boolean canSearch() {
+        return true;
+    }
+}
