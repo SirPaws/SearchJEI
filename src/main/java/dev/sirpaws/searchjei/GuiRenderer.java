@@ -44,8 +44,8 @@ public class GuiRenderer {
 
     private String query = "";
 
-    public void setQuery(String query) {
-        this.query = query;
+    public static void setQuery(String query) {
+        INSTANCE.query = query;
     }
 
     public void guiInit(Screen gui) {
