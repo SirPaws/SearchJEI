@@ -4,20 +4,17 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import dev.sirpaws.searchjei.api.SlotHandler;
 import dev.sirpaws.searchjei.api.SlotViewWrapper;
-import mezz.jei.api.constants.VanillaTypes;
+import dev.sirpaws.searchjei.query.Query;
+import dev.sirpaws.searchjei.utils.GuiUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.phys.Vec2;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -138,10 +135,11 @@ public class GuiRenderer {
     private void drawSlotOverlay(GuiGraphics guiGraphics, AbstractContainerScreen<?> gui) {
         if (!enabled || views == null || views.isEmpty())
             return;
-        float r = ((float) ((CONFIG.search_filteredSlotColor.getRGB() >> 16) & 0xFF)) / 255F;
-        float g = ((float) ((CONFIG.search_filteredSlotColor.getRGB() >> 8) & 0xFF)) / 255F;
-        float b = ((float) (CONFIG.search_filteredSlotColor.getRGB() & 0xFF)) / 255F;
-        float a = (float) CONFIG.search_filteredSlotTransparancy;
+
+        float r = (float) CONFIG.search_filteredSlotColor.getRed()   / 255F;
+        float g = (float) CONFIG.search_filteredSlotColor.getGreen() / 255F;
+        float b = (float) CONFIG.search_filteredSlotColor.getBlue()  / 255F;
+        float a = (float) CONFIG.search_filteredSlotTransparency;
 
         for (Map.Entry<Slot, SlotViewWrapper> entry : views.entrySet()) {
             if (entry.getValue().isEnableOverlay()) {
@@ -166,6 +164,7 @@ public class GuiRenderer {
         } else {
             views.clear();
         }
+        Query q = QueryBuilder.fromText(lastFilterText);
         for (Slot slot : container.getMenu().slots) {
             SlotViewWrapper wrapper;
             if (!views.containsKey(slot)) {
@@ -175,43 +174,15 @@ public class GuiRenderer {
                 wrapper = views.get(slot);
             }
 
-            wrapper.setEnableOverlay(wrapper.getView().canSearch() && !isSearchedItem(slot.getItem()));
+            wrapper.setEnableOverlay(wrapper.getView().canSearch() && !isSearchedItem(q, slot.getItem()));
         }
     }
 
-    private boolean isSearchedItem(ItemStack stack) {
+    private boolean isSearchedItem(Query q, ItemStack stack) {
         if (emptyFilter) return true;
         else if (stack.isEmpty()) return false;
-        int checked = 0;
-        int max = Math.max(1, CONFIG.search_maxResults);
-        for (Object ingredient : JeiEntry.filter.getFilteredIngredients(VanillaTypes.ITEM_STACK)) {
-            if (ItemUtils.ingredientMatches(ingredient, stack)) {
-                return true;
-            }
-            checked++;
-            if (checked >= max) break;
-        }
-        EditBox tf = JeiEntry.getJEITextField();
-        String q = tf != null ? tf.getValue().toLowerCase() : lastFilterText.toLowerCase();
-        if (CONFIG.search_searchCustom) {
-            if (stack.getDisplayName().getString().toLowerCase().contains(q)) {
-                return true;
-            }
-        }
-        if (CONFIG.search_searchTooltip) {
-            try {
-                TooltipFlag flag = TooltipFlag.NORMAL;
-                Item.TooltipContext ctx = Item.TooltipContext.of(Minecraft.getInstance().level);
-                List<Component> lines = stack.getTooltipLines(ctx, Minecraft.getInstance().player, flag);
-                for (net.minecraft.network.chat.Component comp : lines) {
-                    if (comp.getString().toLowerCase().contains(q)) {
-                        return true;
-                    }
-                }
-            } catch (Throwable ignored) {
-            }
-        }
-        return false;
+        if (q.matches(stack)) return true;
+        return JeiEntry.filter.getFilteredItemStacks().stream().anyMatch(i -> JeiEntry.areItemsEqualInterpreter(i, stack));
     }
 
     public void tick() {

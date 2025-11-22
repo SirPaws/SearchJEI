@@ -1,5 +1,6 @@
 package dev.sirpaws.searchjei;
 
+import dev.sirpaws.searchjei.utils.ItemUtils;
 import dev.sirpaws.searchjei.utils.ReflectionUtil;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.helpers.IJeiHelpers;

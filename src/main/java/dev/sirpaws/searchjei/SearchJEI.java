@@ -1,6 +1,7 @@
 package dev.sirpaws.searchjei;
 
 import dev.sirpaws.searchjei.config.Config;
+import dev.sirpaws.searchjei.utils.GuiUtils;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.loader.api.FabricLoader;

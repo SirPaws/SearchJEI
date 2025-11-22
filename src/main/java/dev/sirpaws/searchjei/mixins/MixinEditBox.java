@@ -29,13 +29,12 @@ public abstract class MixinEditBox extends AbstractWidget {
     }
 
     @Inject(method = "onClick", at = @At("HEAD"))
-    private void onClick(MouseButtonEvent event, boolean isDoubleClick, CallbackInfo cir) {
+    private void searchjei$onClick(MouseButtonEvent event, boolean isDoubleClick, CallbackInfo cir) {
         EditBox textField = asTarget(this);
 
         if(JEI_LOADED && JeiEntry.getJEITextField() != null && textField.getClass() == JeiEntry.getJEITextField().getClass()){
             if (ClickManager.isDoubleClick) {
                 GuiRenderer.INSTANCE.toggleMode();
-                GuiRenderer.setQuery(textField.getValue());
             }
         }
     }

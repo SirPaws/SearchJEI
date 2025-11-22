@@ -1,5 +1,6 @@
-package dev.sirpaws.searchjei;
+package dev.sirpaws.searchjei.utils;
 
+import dev.sirpaws.searchjei.SearchJEI;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.MappingResolver;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;

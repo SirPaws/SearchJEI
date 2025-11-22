@@ -1,13 +1,25 @@
-package dev.sirpaws.searchjei;
+package dev.sirpaws.searchjei.utils;
 
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ItemUtils {
-
+    public static String getModName(String namespace) {
+        if (namespace.equals("c")) {
+            return "Common";
+        }
+        Optional<ModContainer> mod = FabricLoader.getInstance().getModContainer(namespace);
+        if (mod.isPresent()) {
+            return mod.get().getMetadata().getName();
+        }
+        return namespace.replace("_", " ").toLowerCase();
+    }
 
     public static boolean ingredientMatches(Object ingredient, ItemStack stack) {
         if (ingredient instanceof ItemStack item) {
